@@ -2,7 +2,7 @@
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Zimbra Collaboration Suite Server
-# Copyright (C) 2005, 2006, 2007 Zimbra, Inc.
+# Copyright (C) 2005, 2006 Zimbra, Inc.
 # 
 # The contents of this file are subject to the Yahoo! Public License
 # Version 1.0 ("License"); you may not use this file except in
@@ -37,12 +37,9 @@ if ($text != NULL) {
     // when splitting words
     $text = preg_replace('/--+/', ' ', $text);
 
-	// Convert to ISO-8859-1
-	$text = iconv("UTF-8", "iso-8859-1", $text);
-
     // Split on anything that's not a word character, quote or dash
-    $words = preg_split('/[^\w\xc0-\xfd-\']+/', $text);
-	
+    $words = preg_split('/[^\w\'-]+/', $text);
+
     // Load dictionary
     $dictionary = pspell_new($locale);
     if ($dictionary == 0) {
@@ -72,7 +69,7 @@ if ($text != NULL) {
         }
 
         // Skip numbers
-        if (preg_match('/[0-9\-]+/', $word)) {
+        if (preg_match('/^[0-9\-]+$/', $word)) {
             continue;
         }
         
@@ -87,8 +84,7 @@ if ($text != NULL) {
         if (!pspell_check($dictionary, $word)) {
             $suggestions = implode(",", pspell_suggest($dictionary, $word));
             $suggestions = utf8_encode($suggestions);
-            $utfw = utf8_encode($word);
-            $misspelled .= "$utfw:$suggestions\n";
+            $misspelled .= "$word:$suggestions\n";
         }
     }
 
