@@ -2,7 +2,7 @@
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Zimbra Collaboration Suite Server
-# Copyright (C) 2005, 2006, 2007 Zimbra, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009 Zimbra, Inc.
 # 
 # The contents of this file are subject to the Yahoo! Public License
 # Version 1.0 ("License"); you may not use this file except in
@@ -14,11 +14,9 @@
 # ***** END LICENSE BLOCK *****
 #
 
-require_once("Zimbra/ServerResponse.php");
-
 $filename = "";
 $text = "";
-$locale = "en_EN";
+$dictionary = "en_EN";
 
 if (isset($_FILES["text"])) {
     $text = file_get_contents($_FILES["text"]);
@@ -26,32 +24,34 @@ if (isset($_FILES["text"])) {
     $text = $_REQUEST["text"];
 }
 
+if (isset($_REQUEST["dictionary"])) {
+    $dictionary = $_REQUEST["dictionary"];
+}
+   
 if (get_magic_quotes_gpc()) {
     $text = stripslashes($text);
 }
 
 if ($text != NULL) {
-    setlocale(LC_ALL, $locale);
+    header("Content-Type: text/plain");
+    set_error_handler("returnError");
+
+    setlocale(LC_ALL, $dictionary);
 
     // Get rid of double-dashes, since we ignore dashes
     // when splitting words
     $text = preg_replace('/--+/', ' ', $text);
 
 	// Convert to ISO-8859-1
-	$text = iconv("UTF-8", "iso-8859-1", $text);
+	$text = iconv("UTF-8", "iso-8859-1//IGNORE", $text);
 
     // Split on anything that's not a word character, quote or dash
     $words = preg_split('/[^\w\xc0-\xfd-\']+/', $text);
 	
     // Load dictionary
-    $dictionary = pspell_new($locale);
+    $dictionary = pspell_new($dictionary);
     if ($dictionary == 0) {
-        $msg = "Unable to open Aspell dictionary for locale " . $locale;
-        error_log($msg);
-        $response = new ServerResponse();
-        $response->addParameter("error", $msg);
-        $response->writeContent();
-        return;
+        returnError("Unable to open dictionary " . $dictionary);
     }
 
     $skip = FALSE;
@@ -92,9 +92,7 @@ if ($text != NULL) {
         }
     }
 
-    $response = new ServerResponse();
-    $response->addParameter("misspelled", $misspelled);
-    $response->writeContent();
+    echo $misspelled;
 } else {
 ?>
 
@@ -107,6 +105,7 @@ if ($text != NULL) {
 <form action="aspell.php" method="post" enctype="multipart/form-data">
     <p>Type in some words to spell check:</p>
     <textarea NAME="text" ROWS="10" COLS="80"></textarea>
+    <p>Dictionary:<input type="text" name="dictionary" value="<?php print $dictionary; ?>" size="8"/></p>
     <p><input type="submit" /></p>
 </form>
 
@@ -115,4 +114,11 @@ if ($text != NULL) {
 
 <?php
     }
+
+function returnError($errno, $message) {
+    header("HTTP/1.1 500 Internal Server Error");
+    error_log("Error $errno: " . $message);
+    exit($message);
+}
+
 ?>
