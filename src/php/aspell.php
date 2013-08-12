@@ -2,10 +2,10 @@
 #
 # ***** BEGIN LICENSE BLOCK *****
 # Zimbra Collaboration Suite Server
-# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 VMware, Inc.
+# Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 Zimbra Software, LLC.
 # 
 # The contents of this file are subject to the Zimbra Public License
-# Version 1.3 ("License"); you may not use this file except in
+# Version 1.4 ("License"); you may not use this file except in
 # compliance with the License.  You may obtain a copy of the License at
 # http://www.zimbra.com/license.
 # 
@@ -18,7 +18,6 @@ $filename = "";
 $text = "";
 $dictionary = "en_EN";
 $ignoreWords = array();
-$ignoreAllCaps = FALSE;
 
 // Split on anything that's not a letter, dash or quote.
 // Special-case Hindi/Devanagari because some characters
@@ -38,9 +37,6 @@ if (isset($_REQUEST["ignore"])) {
     foreach ($wordArray as $word) {
         $ignoreWords[$word] = TRUE;
     }
-}
-if (isset($_REQUEST["ignoreAllCaps"]) && $_REQUEST["ignoreAllCaps"] == "on") {
-  $ignoreAllCaps = TRUE;	
 }
    
 if (get_magic_quotes_gpc()) {
@@ -94,13 +90,6 @@ if ($text != NULL) {
             continue;
         }
         
-        //optionally skip all caps
-        if ($ignoreAllCaps) {
-        	if (!preg_match ('/[^\p{Lu}]/', $word) ){
-              continue;
-        	}
-        }
-
         // Skip duplicates
         if (array_key_exists($word, $checked_words)) {
             continue;
@@ -130,9 +119,8 @@ if ($text != NULL) {
 <form action="aspell.php" method="post" enctype="multipart/form-data">
     <p>Type in some words to spell check:</p>
     <textarea NAME="text" ROWS="10" COLS="80"></textarea>
-    <p>Dictionary: <input type="text" name="dictionary" size="8"/></p>
+    <p>Dictionary: <input type="text" name="dictionary" value="<?php print $dictionary; ?>" size="8"/></p>
     <p>Ignore: <input type="text" name="ignore" size="40"/></p>
-    <p><input type="checkbox" name="ignoreAllCaps" value="on">IgnoreAllCaps</input></p>
     <p><input type="submit" /></p>
 </form>
 
@@ -148,7 +136,7 @@ function returnError($errno, $message) {
     header("Content-Type: text/plain; charset=UTF-8");
     header("HTTP/1.1 500 Internal Server Error");
     error_log("Error $errno: " . $message);
-    exit("Unable to check spelling. See httpd_error.log for details"); 
+    exit($message);
 }
 
 ?>
