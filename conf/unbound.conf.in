@@ -1,0 +1,9 @@
+## Simple recursive caching DNS
+#
+server:
+%%explode 	interface: VAR:zimbraUnboundBindAddress%%
+	verbosity: 1
+
+forward-zone:
+	name: "."
+%%explode 	forward-addr: VAR:zimbraDNSMasterIP%%
