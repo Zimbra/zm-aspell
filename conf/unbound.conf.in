@@ -5,6 +5,7 @@ server:
 	verbosity: 1
 	do-tcp: %%zimbraDNSUseTCP%%
 	do-udp: %%zimbraDNSUseUDP%%
+	tcp-upstream: %%zimbraDNSTCPUpstream%%
 
 forward-zone:
 	name: "."
