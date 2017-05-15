@@ -60,6 +60,12 @@ if ($text != NULL) {
     // when splitting words.
     $text = preg_replace('/--+/u', ' ', $text);
 
+    // Get rid of e-mail addresses
+    $text = preg_replace("/[^@\s]*@[^@\s]*\.[^@\s]*/", ' ', $text);
+
+    // Get rid of URLs
+    $text = preg_replace("/[a-zA-Z]*[:\/\/]*[A-Za-z0-9\-_]+\.+[A-Za-z0-9\.\/%&=\?\-_]+/i", ' ', $text);
+
     // Split on anything that's not a word character, quote or dash
     $words = preg_split($splitRegexp, $text);
 	
