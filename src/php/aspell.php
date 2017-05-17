@@ -56,12 +56,12 @@ if ($text != NULL) {
     // to the client.
     set_error_handler("returnError");
 
+    // Get rid of anything containing @ : # ~ \ or / (hashtags, email addresses, URLs, etc.)
+    $text = preg_replace('/[\S]*[@\/\\:#~][\S]*/', '', $text);
+
     // Get rid of double-dashes, since we ignore dashes
     // when splitting words.
     $text = preg_replace('/--+/u', ' ', $text);
-
-    // Get rid of anything containing @ : # ~ or / (hashtags, email addresses, URLs, etc.)
-    $text = preg_replace('/[\S+)]*[@\/:#~][\S+)]*/', '', $text);
 
     // Split on anything that's not a word character, quote or dash
     $words = preg_split($splitRegexp, $text);
