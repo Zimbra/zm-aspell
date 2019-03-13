@@ -25,7 +25,7 @@ $ignoreAllCaps = FALSE;
 // Split on anything that's not a letter, dash or quote.
 // Special-case Hindi/Devanagari because some characters
 // are not matched by \p{L}.
-$splitRegexp = "/[^\p{L}\p{Devanagari}-\p{N}\']+/u";
+$splitRegexp = "/[^\p{L}\p{Devanagari}\-\p{N}\']+/u";
 
 if (isset($_FILES["text"])) {
     $text = file_get_contents($_FILES["text"]);
