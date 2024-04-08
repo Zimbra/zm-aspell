@@ -44,10 +44,8 @@ if (isset($_REQUEST["ignore"])) {
 if (isset($_REQUEST["ignoreAllCaps"]) && $_REQUEST["ignoreAllCaps"] == "on") {
   $ignoreAllCaps = TRUE;	
 }
-   
-if (get_magic_quotes_gpc()) {
-    $text = stripslashes($text);
-}
+
+$text = stripslashes($text);
 
 if ($text != NULL) {
     setlocale(LC_ALL, $dictionary);
@@ -68,8 +66,8 @@ if ($text != NULL) {
 	
     // Load dictionary
     $dictionary = pspell_new($dictionary, "", "", "UTF-8");
-    if ($dictionary == 0) {
-        returnError("Unable to open dictionary " . $dictionary);
+    if (!is_object($dictionary)) {
+	    returnError("Unable to open dictionary");
     }
 
     $skip = FALSE;
